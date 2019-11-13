@@ -60,7 +60,7 @@ do
     elif [ "$exists" = true ]; then
         echo "No action required."
     fi
-done < domains.csv
+done < domains
 
 if [ "$reload_nginx" = true ]; then
     echo "New certificates installed, reloading nginx"
