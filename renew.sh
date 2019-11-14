@@ -1,5 +1,6 @@
 export GANDI_LIVEDNS_KEY=$(<.gandi-api-key)
 
+successful=true
 acme="$HOME/.acme.sh/acme.sh"
 reload_nginx=false
 while IFS=";" read -r dn subs
@@ -32,6 +33,7 @@ do
             updated=true
         else
             echo "Failed to issue certificate."
+            successful=false
         fi
     else
         openssl x509 -checkend 172800 -noout -in $certificate > /dev/null
@@ -44,6 +46,7 @@ do
                 updated=true
             else
                 echo "Failed to renew certificate"
+                successful=false
             fi
         fi
     fi
@@ -56,6 +59,7 @@ do
             reload_nginx=true
         else
             echo "Failed to install certificate."
+            successful=false
         fi
     elif [ "$exists" = true ]; then
         echo "No action required."
@@ -70,7 +74,14 @@ if [ "$reload_nginx" = true ]; then
         echo "Successfully updated certificates"
     else
         echo "Failed to reload nginx"
+        successful=false
     fi
 else
     echo "No updates detected"
+fi
+
+if [ "$successful" = false ]; then
+    exit 1
+else
+    exit 0
 fi
